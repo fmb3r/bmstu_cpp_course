@@ -121,6 +121,7 @@ class simple_basic_string
 		{
 			*(ptr_ + i) = *(other.ptr_ + i);
 		}
+
 		return *this;
 	}
 
