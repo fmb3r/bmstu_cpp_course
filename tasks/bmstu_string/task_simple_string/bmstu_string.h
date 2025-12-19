@@ -81,7 +81,7 @@ class simple_basic_string
 	}
 
 	/// Деструктор
-	~simple_basic_string() {}
+	~simple_basic_string() { delete[] ptr_; }
 
 	/// Геттер на си-строку
 	const T* c_str() const { return ptr_; }
@@ -125,7 +125,7 @@ class simple_basic_string
 		return *this;
 	}
 
-	/// Оператор конкатенации
+	/// Оператор сложения строк
 	friend simple_basic_string<T> operator+(const simple_basic_string<T>& left,
 											const simple_basic_string<T>& right)
 	{
@@ -154,20 +154,20 @@ class simple_basic_string
 	friend S& operator>>(S& is, simple_basic_string& obj)
 	{
 		T ch;
-		size_t i = 0;
+		size_t z = 0;
 		T* new_ptr = new T[100];
 
 		while (is.get(ch))
 		{
-			new_ptr[i++] = ch;
+			new_ptr[z++] = ch;
 		}
 
-		new_ptr[i] = T(0);
+		new_ptr[z] = T(0);
 
 		delete[] obj.ptr_;
 
 		obj.ptr_ = new_ptr;
-		obj.size_ = i;
+		obj.size_ = z;
 
 		return is;
 	}
@@ -184,17 +184,18 @@ class simple_basic_string
 			new_ptr[size_ + j] = other.ptr_[j];
 		}
 		new_ptr[size_ + other.size_] = T(0);
+
 		delete[] ptr_;
 
 		ptr_ = new_ptr;
-		size_ += other.size_;
+		size_ = other.size_ + size_;
 
 		return *this;
 	}
 
 	simple_basic_string& operator+=(T symbol)
 	{
-		T* new_ptr = new T[size_ + 2];
+		T* new_ptr = new T[size_ + 1 + 1];
 		for (auto i = 0; i < size_; ++i)
 		{
 			new_ptr[i] = ptr_[i];
@@ -211,7 +212,14 @@ class simple_basic_string
 
 	T& operator[](size_t index) noexcept { return *(ptr_ + index); }
 
-	T& at(size_t index) { throw std::out_of_range("Wrong index"); }
+	T& at(size_t index)
+	{
+		if (index >= size_)
+		{
+			throw std::out_of_range("Wrong index");
+		}
+		return ptr_[index];
+	}
 
 	T* data() { return ptr_; }
 
