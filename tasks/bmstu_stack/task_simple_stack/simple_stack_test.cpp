@@ -52,6 +52,74 @@ int CountCopyMoveDefault::default_constructor_count = 0;
 int CountCopyMoveDefault::assignment_copy_count = 0;
 int CountCopyMoveDefault::assignment_move_count = 0;
 
+TEST(StackTest, Copyconstructor)
+{
+	bmstu::stack<int> s;
+	s.push(1);
+	s.push(2);
+	s.push(3);
+	s.push(4);
+	s.push(100);
+
+	bmstu::stack<int> s1(s);
+	ASSERT_EQ(s1.size(), 5);
+	ASSERT_EQ(s1.top(), 100);
+}
+
+TEST(StackTest, Moveconstructor)
+{
+	bmstu::stack<int> s;
+	s.push(1);
+	s.push(2);
+	s.push(3);
+	s.push(4);
+	s.push(100);
+
+	bmstu::stack<int> s1(std::move(s));
+	ASSERT_EQ(s1.size(), 5);
+	ASSERT_EQ(s1.top(), 100);
+}
+
+TEST(StackTest, MoveAssigment)
+{
+	bmstu::stack<int> s;
+	s.push(1);
+	s.push(2);
+	s.push(3);
+	s.push(4);
+	s.push(100);
+	int* data = s.data();
+
+	bmstu::stack<int> s1;
+	s1.push(666);
+	s1.push(667);
+	s1 = std::move(s);
+	ASSERT_NE(s.data(), data);
+
+	ASSERT_EQ(s1.size(), 5u);
+	ASSERT_EQ(s1.top(), 100);
+}
+
+TEST(StackTest, CopyAssigment)
+{
+	bmstu::stack<int> s;
+	s.push(1);
+	s.push(2);
+	s.push(3);
+	s.push(4);
+	s.push(100);
+	int* data = s.data();
+
+	bmstu::stack<int> s1;
+	s1.push(666);
+	s1.push(667);
+	s1 = s;
+	ASSERT_EQ(s.data(), data);
+
+	ASSERT_EQ(s1.size(), 5u);
+	ASSERT_EQ(s1.top(), 100);
+}
+
 TEST(StackTest, DefaultConstructor)
 {
 	bmstu::stack<int> s;

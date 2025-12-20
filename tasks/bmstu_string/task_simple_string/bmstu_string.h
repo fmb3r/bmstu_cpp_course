@@ -153,13 +153,13 @@ class simple_basic_string
 	template <typename S>
 	friend S& operator>>(S& is, simple_basic_string& obj)
 	{
-		T ch;
+		T c;
 		size_t z = 0;
 		T* new_ptr = new T[100];
 
-		while (is.get(ch))
+		while (is.get(c))
 		{
-			new_ptr[z++] = ch;
+			new_ptr[z++] = c;
 		}
 
 		new_ptr[z] = T(0);
@@ -179,9 +179,9 @@ class simple_basic_string
 		{
 			new_ptr[i] = ptr_[i];
 		}
-		for (auto j = 0; j < other.size_; ++j)
+		for (auto i = 0; i < other.size_; ++i)
 		{
-			new_ptr[size_ + j] = other.ptr_[j];
+			new_ptr[size_ + i] = other.ptr_[i];
 		}
 		new_ptr[size_ + other.size_] = T(0);
 
@@ -212,14 +212,7 @@ class simple_basic_string
 
 	T& operator[](size_t index) noexcept { return *(ptr_ + index); }
 
-	T& at(size_t index)
-	{
-		if (index >= size_)
-		{
-			throw std::out_of_range("Wrong index");
-		}
-		return ptr_[index];
-	}
+	T& at(size_t index) { throw std::out_of_range("Wrong index"); }
 
 	T* data() { return ptr_; }
 

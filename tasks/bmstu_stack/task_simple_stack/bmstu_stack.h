@@ -12,6 +12,76 @@ class stack
    public:
 	stack() : data_(nullptr), size_(0) {}
 
+	// копирование
+	stack(const stack& other) : data_(nullptr), size_(0)
+	{
+		data_ = (T*)operator new(sizeof(T) * other.size_);
+		size_ = other.size_;
+		for (size_t i = 0; i < size_; ++i)
+		{
+			new (data_ + i) T(other.data_[i]);
+		}
+	}
+
+	// копирующее присваивание
+	stack& operator=(const stack& other)
+	{
+		if (this != &other)
+		{
+			clear();
+			operator delete(data_);
+			data_ = (T*)operator new(sizeof(T) * other.size_);
+			size_ = other.size_;
+			for (size_t i = 0; i < size_; ++i)
+			{
+				new (data_ + i) T(other.data_[i]);
+			}
+		}
+		return *this;
+	}
+
+	// перемещение
+	stack(stack&& other) noexcept : data_(nullptr), size_(0)
+	{
+		data_ = other.data_;
+		size_ = other.size_;
+		other.data_ = nullptr;
+		other.size_ = 0;
+	}
+
+	// перемещающее присваивание
+	stack& operator=(stack&& other) noexcept
+	{
+		if (this != &other)
+		{
+			clear();
+			operator delete(data_);
+			data_ = other.data_;
+			size_ = other.size_;
+			other.data_ = nullptr;
+			other.size_ = 0;
+		}
+		return *this;
+	}
+
+	// void copy(const stack& other)
+	// 	data_ = new T[other.size_];
+	// 	size_ = other.size_;
+	// for (size_t i = 0; i < size_; ++i)
+	// {
+	// 	data_[i] = other.data_[i];
+	// }
+	// }
+
+	// void move(stack& other)
+	// {
+	// 	data_ = other.data_;
+	// 	size_ = other.size_;
+
+	// 	other.data_ = nullptr;
+	// 	other.size_ = 0;
+	// }
+
 	bool empty() const noexcept { return size_ == 0; }
 
 	size_t size() const noexcept { return size_; }
@@ -75,6 +145,8 @@ class stack
 		}
 		return data_[size_ - 1];
 	}
+
+	T* data() const { return data_; }
 
 	const T& top() const
 	{
