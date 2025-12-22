@@ -120,6 +120,23 @@ TEST(StackTest, CopyAssigment)
 	ASSERT_EQ(s1.top(), 100);
 }
 
+// TEST(StackTest, CopyAs)
+// {
+// 	bmstu::stack<int> s;
+// 	s.push(1);
+// 	s.push(2);
+// 	s.push(3);
+// 	s.push(4);
+// 	s.push(100);
+// 	int* data = s.data();
+
+// 	s = s;
+// 	ASSERT_EQ(s.data(), data);
+
+// 	ASSERT_EQ(s1.size(), 5u);
+// 	ASSERT_EQ(s1.top(), 100);
+// }
+
 TEST(StackTest, DefaultConstructor)
 {
 	bmstu::stack<int> s;
