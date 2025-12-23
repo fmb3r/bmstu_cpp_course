@@ -206,9 +206,10 @@ class basic_string
 	// конструктор копирования
 	basic_string(const basic_string& other)
 	{
-		if (other.is_long_)
+		is_long_ = other.is_long_;
+
+		if (is_long())
 		{
-			is_long_ = true;
 			data_.long_str.size = other.data_.long_str.size;
 			data_.long_str.capacity = other.data_.long_str.capacity;
 
@@ -222,23 +223,17 @@ class basic_string
 		}
 		else
 		{
-			is_long_ = false;
-			data_.short_str.size = other.data_.short_str.size;
-
-			for (size_t i = 0; i < data_.short_str.size; ++i)
-			{
-				data_.short_str.buffer[i] = other.data_.short_str.buffer[i];
-			}
-			data_.short_str.buffer[data_.short_str.size] = T(0);
+			data_.short_str = other.data_.short_str;
 		}
 	}
 
 	// конструктор перемещения
 	basic_string(basic_string&& dying) noexcept
 	{
-		if (dying.is_long_)
+		is_long_ = dying.is_long_;
+
+		if (is_long())
 		{
-			is_long_ = true;
 			data_.long_str.ptr = dying.data_.long_str.ptr;
 			data_.long_str.size = dying.data_.long_str.size;
 			data_.long_str.capacity = dying.data_.long_str.capacity;
@@ -249,15 +244,10 @@ class basic_string
 		}
 		else
 		{
-			is_long_ = false;
-			data_.short_str.size = dying.data_.short_str.size;
-
-			for (size_t i = 0; i < data_.short_str.size; ++i)
-			{
-				data_.short_str.buffer[i] = dying.data_.short_str.buffer[i];
-			}
-			data_.short_str.buffer[data_.short_str.size] = T(0);
+			data_.short_str = dying.data_.short_str;
 		}
+		dying.is_long_ = false;
+		dying.data_.short_str.size = 0;
 	}
 
 	// деструктор
