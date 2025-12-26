@@ -97,9 +97,10 @@ class basic_string
 	{
 		is_long_ = false;
 		data_.short_str.size = 0;
-		data_.short_str.buffer[0] = T(0);
+		data_.short_str.buffer[0] = T();
 	}
 
+	// создрание строки заполненной пробелами
 	basic_string(size_t size)
 	{
 		if (size <= SSO_CAPACITY)
@@ -111,24 +112,24 @@ class basic_string
 			{
 				data_.short_str.buffer[i] = T(' ');
 			}
-			data_.short_str.buffer[size] = T(0);
+			data_.short_str.buffer[size] = T();
 		}
 		else
 		{
 			is_long_ = true;
 			data_.long_str.size = size;
 			data_.long_str.capacity = size;
-
 			data_.long_str.ptr = new T[size + 1];
 
 			for (size_t i = 0; i < size; i++)
 			{
 				data_.long_str.ptr[i] = T(' ');
 			}
-			data_.long_str.ptr[size] = T(0);
+			data_.long_str.ptr[size] = T();
 		}
 	}
 
+	// конструктор из списка il
 	basic_string(std::initializer_list<T> il)
 	{
 		size_t len = il.size();
@@ -144,7 +145,7 @@ class basic_string
 				data_.short_str.buffer[i] = *elem;
 				++i;
 			}
-			data_.short_str.buffer[len] = T(0);
+			data_.short_str.buffer[len] = T();
 		}
 		else
 		{
@@ -160,20 +161,13 @@ class basic_string
 				data_.long_str.ptr[i] = *elem;
 				++i;
 			}
-			data_.long_str.ptr[len] = T(0);
+			data_.long_str.ptr[len] = T();
 		}
 	}
 
+	// конструктор из си строки
 	basic_string(const T* c_str)
 	{
-		if (!c_str)
-		{
-			is_long_ = false;
-			data_.short_str.size = 0;
-			data_.short_str.buffer[0] = T(0);
-			return;
-		}
-
 		size_t len = strlen_(c_str);
 
 		if (len <= SSO_CAPACITY)
@@ -185,7 +179,7 @@ class basic_string
 			{
 				data_.short_str.buffer[i] = c_str[i];
 			}
-			data_.short_str.buffer[len] = T(0);
+			data_.short_str.buffer[len] = T();
 		}
 		else
 		{
@@ -199,7 +193,7 @@ class basic_string
 			{
 				data_.long_str.ptr[i] = c_str[i];
 			}
-			data_.long_str.ptr[len] = T(0);
+			data_.long_str.ptr[len] = T();
 		}
 	}
 
@@ -213,13 +207,13 @@ class basic_string
 			data_.long_str.size = other.data_.long_str.size;
 			data_.long_str.capacity = other.data_.long_str.capacity;
 
-			data_.long_str.ptr = new T[data_.long_str.capacity + 1];
+			data_.long_str.ptr = new T[data_.long_str.size + 1];
 
 			for (size_t i = 0; i < data_.long_str.size; ++i)
 			{
 				data_.long_str.ptr[i] = other.data_.long_str.ptr[i];
 			}
-			data_.long_str.ptr[data_.long_str.size] = T(0);
+			data_.long_str.ptr[data_.long_str.size] = T();
 		}
 		else
 		{
@@ -238,9 +232,8 @@ class basic_string
 			data_.long_str.size = dying.data_.long_str.size;
 			data_.long_str.capacity = dying.data_.long_str.capacity;
 
-			dying.is_long_ = false;
-			dying.data_.short_str.size = 0;
-			dying.data_.short_str.buffer[0] = T();
+			dying.data_.long_str.ptr = nullptr;
+			dying.data_.long_str.size = 0;
 		}
 		else
 		{
@@ -256,6 +249,7 @@ class basic_string
 		if (is_long_)
 		{
 			delete[] data_.long_str.ptr;
+			data_.long_str.ptr = nullptr;
 		}
 	}
 
@@ -272,10 +266,6 @@ class basic_string
 	{
 		if (this != &other)
 		{
-			if (is_long_)
-			{
-				delete[] data_.long_str.ptr;
-			}
 			if (other.is_long_)
 			{
 				is_long_ = true;
@@ -285,43 +275,24 @@ class basic_string
 
 				other.is_long_ = false;
 				other.data_.short_str.size = 0;
-				other.data_.short_str.buffer[0] = T(0);
+				other.data_.short_str.buffer[0] = T();
 			}
 			else
 			{
-				is_long_ = false;
-				data_.short_str.size = other.data_.short_str.size;
-
-				for (size_t i = 0; i < data_.short_str.size; ++i)
-				{
-					data_.short_str.buffer[i] = other.data_.short_str.buffer[i];
-				}
-				data_.short_str.buffer[data_.short_str.size] = T(0);
+				data_.short_str = other.data_.short_str;
 			}
 			other.is_long_ = false;
 			other.data_.short_str.size = 0;
-			other.data_.short_str.buffer[0] = T(0);
+			other.data_.short_str.buffer[0] = T();
 		}
 		return *this;
 	}
 
+	// оператор присваивания из си строки
 	basic_string& operator=(const T* c_str)
 	{
 		if (data() != c_str)
 		{
-			if (is_long_)
-			{
-				delete[] data_.long_str.ptr;
-			}
-
-			if (!c_str)
-			{
-				is_long_ = false;
-				data_.short_str.size = 0;
-				data_.short_str.buffer[0] = T(0);
-				return *this;
-			}
-
 			size_t len = strlen_(c_str);
 
 			if (len <= SSO_CAPACITY)
@@ -333,7 +304,7 @@ class basic_string
 				{
 					data_.short_str.buffer[i] = c_str[i];
 				}
-				data_.short_str.buffer[len] = T(0);
+				data_.short_str.buffer[len] = T();
 			}
 			else
 			{
@@ -347,7 +318,7 @@ class basic_string
 				{
 					data_.long_str.ptr[i] = c_str[i];
 				}
-				data_.long_str.ptr[len] = T(0);
+				data_.long_str.ptr[len] = T();
 			}
 		}
 		return *this;
@@ -358,10 +329,6 @@ class basic_string
 	{
 		if (this != &other)
 		{
-			if (is_long_)
-			{
-				delete[] data_.long_str.ptr;
-			}
 			if (other.is_long_)
 			{
 				is_long_ = true;
@@ -374,7 +341,7 @@ class basic_string
 				{
 					data_.long_str.ptr[i] = other.data_.long_str.ptr[i];
 				}
-				data_.long_str.ptr[data_.long_str.size] = T(0);
+				data_.long_str.ptr[data_.long_str.size] = T();
 			}
 			else
 			{
@@ -385,7 +352,7 @@ class basic_string
 				{
 					data_.short_str.buffer[i] = other.data_.short_str.buffer[i];
 				}
-				data_.short_str.buffer[data_.short_str.size] = T(0);
+				data_.short_str.buffer[data_.short_str.size] = T();
 			}
 		}
 		return *this;
@@ -409,7 +376,7 @@ class basic_string
 			*(result.data() + pos + i) = *(right.c_str() + i);
 		}
 
-		result.data()[left.size() + right.size()] = T(0);
+		result.data()[left.size() + right.size()] = T();
 
 		return result;
 	}
@@ -426,21 +393,18 @@ class basic_string
 	template <typename S>
 	friend S& operator>>(S& is, basic_string& obj)
 	{
-		T* buffer = new T[4096];
-		size_t z = 0;
+		obj = basic_string();
 
 		T ch;
-
-		while (is.get(ch))
+		while (is.get(ch))	// get() извлекает символ
 		{
-			buffer[z++] = ch;
+			obj += ch;
 		}
-		buffer[z] = T(0);
-		obj = buffer;
-		delete[] buffer;
+
 		return is;
 	}
 
+	// добавление строки к текущей
 	basic_string& operator+=(const basic_string& other)
 	{
 		size_t l_size = size();
@@ -458,12 +422,7 @@ class basic_string
 		{
 			new_ptr[l_size + i] = other.c_str()[i];
 		}
-		new_ptr[new_size] = T(0);
-
-		if (is_long_)
-		{
-			delete[] data_.long_str.ptr;
-		}
+		new_ptr[new_size] = T();
 
 		is_long_ = true;
 		data_.long_str.ptr = new_ptr;
@@ -473,6 +432,7 @@ class basic_string
 		return *this;
 	}
 
+	// добавление символа к текущей строке
 	basic_string& operator+=(T symbol)
 	{
 		size_t l_size = size();
@@ -486,7 +446,7 @@ class basic_string
 		}
 
 		new_ptr[l_size] = symbol;
-		new_ptr[new_size] = T(0);
+		new_ptr[new_size] = T();
 
 		if (is_long_)
 		{
@@ -512,7 +472,7 @@ class basic_string
 	static size_t strlen_(const T* str)
 	{
 		size_t len = 0;
-		while (str[len] != T(0))
+		while (str[len] != T())
 		{
 			++len;
 		}
